@@ -31,4 +31,43 @@ This project implements an event-driven architecture for processing orders in an
 
 ## Lambda Function Code
 ```python
-# Include your Lambda function code here
+import json
+import boto3
+
+def lambda_handler(event, context):
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('Orders')
+    
+    for record in event['Records']:
+        sns_message = json.loads(record['body'])
+        
+        order_data = json.loads(sns_message['Message'])
+        
+        order_id = order_data['orderId']
+        user_id = order_data['userId']
+        item_name = order_data['itemName']
+        quantity = order_data['quantity']
+        status = order_data['status']
+        timestamp = order_data['timestamp']
+        
+        print(f"Received order: {order_id} , {item_name} , {quantity} , {status} , {timestamp}")
+        
+        try:
+            response = table.put_item(
+                Item = {
+                    'orderId' : order_id ,
+                    'userId' : user_id ,
+                    'itemName' : item_name ,
+                    'quantity' : quantity ,
+                    'status' : status ,
+                    'timestamp' : timestamp
+                }
+            )
+            print(f"Order {order_id} saved to DynamoDB.")
+        except Exception as e:
+            print(f"Error saving order to DynamoDB: {e}")
+    
+    return {
+        'statusCode': 200 ,
+        'body': json.dumps('Message processed successfully')
+    }
