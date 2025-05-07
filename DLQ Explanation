@@ -1,7 +1,0 @@
-Amazon SQS’s Dead-Letter Queue (DLQ) and Visibility Timeout settings are important for ensuring fault tolerance and reliability.
-
-Visibility Timeout prevents other Lambda instances from processing the same message while the current Lambda is still working on it. This helps avoid duplicate processing when message handling takes time or temporarily fails.
-
-DLQ catches failed messages after 3 unsuccessful receive attempts. If Lambda throws an error or crashes while processing a message 3 times, the message is sent to the DLQ. This ensures that failing messages are not lost and can be manually reviewed without affecting live traffic.
-
-In summary, these features reduce the risk of data corruption and allow smooth handling of partial failures.
